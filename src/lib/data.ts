@@ -135,11 +135,11 @@ export const conversations: Conversation[] = [
     { id: 'conv-2', participantIds: ['user-4', 'user-2'], lastMessage: conversation2Messages[conversation2Messages.length - 1] },
 ];
 
-// Mock current user - switch this to 'user-2' to test seller view
+// Mock current user - currently set to a seller. Switch to a buyer to test buyer view.
 export const getCurrentUser = (): User => {
-  const buyer = users.find(u => u.role === 'buyer');
-  if (!buyer) throw new Error("No buyer found in mock data.");
-  return buyer;
+  const seller = users.find(u => u.role === 'seller' && u.id === 'user-2');
+  if (!seller) throw new Error("Seller with id 'user-2' not found in mock data.");
+  return seller;
 };
 
 export const getSellerUser = (): User => {

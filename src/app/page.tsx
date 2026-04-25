@@ -86,7 +86,9 @@ export default function Home() {
         </section>
       </main>
       <footer className="flex items-center justify-center w-full h-16 border-t">
-        <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} BidSavvy. All rights reserved.</p>
+        <p className="text-xs text-muted-foreground">
+          Made with <span className="inline-block animate-beat text-red-500">❤️</span>! Handcrafted by Team Kishan
+        </p>
       </footer>
     </div>
   );

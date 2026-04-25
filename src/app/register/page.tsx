@@ -79,11 +79,11 @@ export default function RegisterPage() {
               <RadioGroup value={role} onValueChange={(value: 'buyer' | 'seller') => setRole(value)} className="flex gap-4">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="seller" id="r-seller" />
-                  <Label htmlFor="r-seller">Seller (Looking for work)</Label>
+                  <Label htmlFor="r-seller">Seller</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="buyer" id="r-buyer" />
-                  <Label htmlFor="r-buyer">Buyer (Looking to hire)</Label>
+                  <Label htmlFor="r-buyer">Buyer</Label>
                 </div>
               </RadioGroup>
             </div>

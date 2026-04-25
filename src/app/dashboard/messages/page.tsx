@@ -1,19 +1,41 @@
+'use client';
+import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getCurrentUser, conversations, users, messages as allMessages } from "@/lib/data";
+import { useAppContext } from "@/context/app-context";
 import { cn } from "@/lib/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import { Send } from "lucide-react";
+import type { Conversation, User } from '@/lib/types';
 
 export default function MessagesPage() {
-    const currentUser = getCurrentUser();
+    const { currentUser, users, conversations, messages, sendMessage } = useAppContext();
+    const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+    const [messageText, setMessageText] = useState('');
+
+    if (!currentUser) return null;
+
     const myConversations = conversations.filter(c => c.participantIds.includes(currentUser.id));
-    const selectedConversation = myConversations[0];
-    const otherUser = users.find(u => u.id === selectedConversation.participantIds.find(id => id !== currentUser.id));
-    const conversationMessages = allMessages.filter(m => m.conversationId === selectedConversation.id);
+
+    const selectedConversation = myConversations.find(c => c.id === selectedConversationId) || myConversations[0];
+
+    const otherUser = selectedConversation ? users.find(u => u.id === selectedConversation.participantIds.find(id => id !== currentUser.id)) : null;
+    
+    const conversationMessages = selectedConversation ? messages.filter(m => m.conversationId === selectedConversation.id) : [];
+
+    const handleSendMessage = () => {
+        if (messageText.trim() && selectedConversation && currentUser && otherUser) {
+            sendMessage(selectedConversation.id, currentUser.id, otherUser.id, messageText);
+            setMessageText('');
+        }
+    };
+    
+    const handleSelectConversation = (conv: Conversation) => {
+        setSelectedConversationId(conv.id);
+    }
 
     return (
         <div className="h-[calc(100vh-8rem)]">
@@ -26,10 +48,10 @@ export default function MessagesPage() {
                         </div>
                         <ScrollArea className="flex-grow">
                             {myConversations.map(conv => {
-                                const participant = users.find(u => u.id === conv.participantIds.find(id => id !== currentUser.id));
+                                const participant = users.find(u => u.id === conv.participantIds.find(id => id !== currentUser!.id));
                                 if (!participant) return null;
                                 return (
-                                    <div key={conv.id} className={cn("p-4 border-b flex items-start gap-4 cursor-pointer hover:bg-muted/50", selectedConversation.id === conv.id && "bg-muted")}>
+                                    <div key={conv.id} onClick={() => handleSelectConversation(conv)} className={cn("p-4 border-b flex items-start gap-4 cursor-pointer hover:bg-muted/50", selectedConversation?.id === conv.id && "bg-muted")}>
                                         <Avatar>
                                             <AvatarImage src={participant.avatarUrl} alt={participant.name} />
                                             <AvatarFallback>{participant.name.charAt(0)}</AvatarFallback>
@@ -76,12 +98,17 @@ export default function MessagesPage() {
                                     </div>
                                 </ScrollArea>
                                 <div className="p-4 border-t">
-                                    <div className="relative">
-                                        <Input placeholder="Type a message..." className="pr-12" />
-                                        <Button size="icon" className="absolute top-1/2 right-1 -translate-y-1/2 h-8 w-8">
+                                    <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="relative">
+                                        <Input 
+                                            placeholder="Type a message..." 
+                                            className="pr-12" 
+                                            value={messageText}
+                                            onChange={(e) => setMessageText(e.target.value)}
+                                        />
+                                        <Button type="submit" size="icon" className="absolute top-1/2 right-1 -translate-y-1/2 h-8 w-8">
                                             <Send className="h-4 w-4" />
                                         </Button>
-                                    </div>
+                                    </form>
                                 </div>
                             </>
                         ) : (

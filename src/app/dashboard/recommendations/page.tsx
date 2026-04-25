@@ -3,17 +3,19 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { projects, getSellerUser } from '@/lib/data';
+import { useAppContext } from '@/context/app-context';
 import { recommendProjectsToSeller, type SellerProjectRecommendationOutput } from '@/ai/flows/seller-project-recommendation';
 import { Loader2, Lightbulb, Gavel } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 
 export default function RecommendationsPage() {
-  const seller = getSellerUser();
+  const { currentUser, projects } = useAppContext();
   const [recommendations, setRecommendations] = useState<SellerProjectRecommendationOutput['recommendedProjects']>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  if (!currentUser) return null;
 
   const getRecommendations = async () => {
     setIsLoading(true);
@@ -28,8 +30,8 @@ export default function RecommendationsPage() {
       }));
       
       const result = await recommendProjectsToSeller({
-        sellerSkills: seller.skills || [],
-        sellerProfileDescription: seller.profileDescription || '',
+        sellerSkills: currentUser.skills || [],
+        sellerProfileDescription: currentUser.profileDescription || '',
         availableProjects: availableProjectsForAI,
       });
 

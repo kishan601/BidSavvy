@@ -1,3 +1,4 @@
+'use client';
 import {
   Card,
   CardContent,
@@ -9,14 +10,27 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { projects, users, bids } from '@/lib/data';
+import { useAppContext } from '@/context/app-context';
 import { Calendar, DollarSign, Search } from 'lucide-react';
 import Link from 'next/link';
 import Header from '@/components/header';
 import { formatDistanceToNow } from 'date-fns';
+import { useState } from 'react';
 
 export default function ProjectsPage() {
+  const { projects, users, bids } = useAppContext();
+  const [searchTerm, setSearchTerm] = useState('');
+
   const openProjects = projects.filter(p => p.status === 'open');
+
+  const filteredProjects = openProjects.filter(project => {
+    const searchTermLower = searchTerm.toLowerCase();
+    return (
+      project.title.toLowerCase().includes(searchTermLower) ||
+      project.description.toLowerCase().includes(searchTermLower) ||
+      project.requiredSkills.some(skill => skill.toLowerCase().includes(searchTermLower))
+    );
+  });
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -30,12 +44,17 @@ export default function ProjectsPage() {
         <div className="mb-6">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input placeholder="Search projects by keyword, skill..." className="pl-10" />
+            <Input 
+              placeholder="Search projects by keyword, skill..." 
+              className="pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)} 
+            />
           </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {openProjects.map(project => {
+          {filteredProjects.map(project => {
             const projectBids = bids.filter(b => b.projectId === project.id);
             const buyer = users.find(u => u.id === project.buyerId);
             return (

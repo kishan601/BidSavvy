@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Card,
   CardContent,
@@ -14,34 +16,37 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { getCurrentUser, projects, bids, users } from '@/lib/data';
+import { useAppContext } from '@/context/app-context';
 import { Briefcase, DollarSign, Gavel, Users } from 'lucide-react';
-import type { User } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 export default function DashboardPage() {
-  const user: User = getCurrentUser();
+  const { currentUser, projects, bids, users } = useAppContext();
+
+  if (!currentUser) {
+    return null; // Or a loading indicator
+  }
 
   const buyerStats = [
     {
       title: 'Active Projects',
-      value: projects.filter(p => p.buyerId === user.id && p.status === 'open').length,
+      value: projects.filter(p => p.buyerId === currentUser.id && p.status === 'open').length,
       icon: Briefcase,
     },
     {
       title: 'Total Bids Received',
-      value: bids.filter(b => projects.some(p => p.id === b.projectId && p.buyerId === user.id)).length,
+      value: bids.filter(b => projects.some(p => p.id === b.projectId && p.buyerId === currentUser.id)).length,
       icon: Gavel,
     },
     {
       title: 'Completed Projects',
-      value: projects.filter(p => p.buyerId === user.id && p.status === 'completed').length,
+      value: projects.filter(p => p.buyerId === currentUser.id && p.status === 'completed').length,
       icon: Briefcase,
     },
      {
       title: 'Total Spent',
-      value: `$${bids.filter(b => b.status === 'accepted' && projects.find(p => p.id === b.projectId)?.buyerId === user.id).reduce((sum, b) => sum + b.amount, 0)}`,
+      value: `$${bids.filter(b => b.status === 'accepted' && projects.find(p => p.id === b.projectId)?.buyerId === currentUser.id).reduce((sum, b) => sum + b.amount, 0)}`,
       icon: DollarSign,
     },
   ];
@@ -49,17 +54,17 @@ export default function DashboardPage() {
   const sellerStats = [
     {
       title: 'Active Bids',
-      value: bids.filter(b => b.sellerId === user.id && b.status === 'pending').length,
+      value: bids.filter(b => b.sellerId === currentUser.id && b.status === 'pending').length,
       icon: Gavel,
     },
     {
       title: 'Projects Won',
-      value: bids.filter(b => b.sellerId === user.id && b.status === 'accepted').length,
+      value: bids.filter(b => b.sellerId === currentUser.id && b.status === 'accepted').length,
       icon: Briefcase,
     },
     {
       title: 'Total Earnings',
-      value: `$${bids.filter(b => b.sellerId === user.id && b.status === 'accepted').reduce((sum, b) => sum + b.amount, 0)}`,
+      value: `$${bids.filter(b => b.sellerId === currentUser.id && b.status === 'accepted').reduce((sum, b) => sum + b.amount, 0)}`,
       icon: DollarSign,
     },
     {
@@ -69,14 +74,14 @@ export default function DashboardPage() {
     },
   ];
 
-  const stats = user.role === 'buyer' ? buyerStats : sellerStats;
+  const stats = currentUser.role === 'buyer' ? buyerStats : sellerStats;
   const recentBids = bids
-    .filter(b => projects.some(p => p.id === b.projectId && p.buyerId === user.id))
+    .filter(b => projects.some(p => p.id === b.projectId && p.buyerId === currentUser.id))
     .slice(0, 5);
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold font-headline">Welcome back, {user.name.split(' ')[0]}!</h1>
+      <h1 className="text-3xl font-bold font-headline">Welcome back, {currentUser.name.split(' ')[0]}!</h1>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, index) => (
@@ -92,7 +97,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {user.role === 'buyer' && (
+      {currentUser.role === 'buyer' && (
         <Card>
           <CardHeader>
             <CardTitle>Recent Bids on Your Projects</CardTitle>
@@ -135,7 +140,7 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      {user.role === 'seller' && (
+      {currentUser.role === 'seller' && (
          <Card>
           <CardHeader>
             <CardTitle>Find Your Next Opportunity</CardTitle>

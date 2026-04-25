@@ -1,3 +1,4 @@
+'use client';
 import {
   Card,
   CardContent,
@@ -8,13 +9,17 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { projects, bids, getCurrentUser } from '@/lib/data';
+import { useAppContext } from '@/context/app-context';
 import { Gavel, PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export default function BuyerProjectsPage() {
-  const user = getCurrentUser();
-  const myProjects = projects.filter(p => p.buyerId === user.id);
+  const { currentUser, projects, bids } = useAppContext();
+  
+  if (!currentUser) {
+    return null;
+  }
+  const myProjects = projects.filter(p => p.buyerId === currentUser.id);
 
   return (
     <div className="space-y-6">

@@ -16,10 +16,15 @@ import {
   PlusCircle,
   User as UserIcon,
 } from 'lucide-react';
-import type { User } from '@/lib/types';
+import { useAppContext } from '@/context/app-context';
 
-export function DashboardNav({ user }: { user: User }) {
+export function DashboardNav() {
   const pathname = usePathname();
+  const { currentUser } = useAppContext();
+
+  if (!currentUser) {
+    return null; // or loading skeleton
+  }
 
   const buyerLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutGrid },
@@ -38,7 +43,7 @@ export function DashboardNav({ user }: { user: User }) {
     { href: '/dashboard/profile', label: 'Profile', icon: UserIcon },
   ];
 
-  const links = user.role === 'buyer' ? buyerLinks : sellerLinks;
+  const links = currentUser.role === 'buyer' ? buyerLinks : sellerLinks;
 
   return (
     <SidebarMenu>

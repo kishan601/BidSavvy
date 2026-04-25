@@ -1,17 +1,17 @@
-import type { User, Project, Bid, Conversation, Message } from './types';
+import type { User, Project, Bid, Conversation, Message } from '@/lib/types';
 
 export const users: User[] = [
   {
     id: 'user-1',
     name: 'Alice Johnson',
-    email: 'alice@example.com',
+    email: 'buyer@test.com',
     avatarUrl: 'https://picsum.photos/seed/avatar1/100/100',
     role: 'buyer',
   },
   {
     id: 'user-2',
     name: 'Bob Williams',
-    email: 'bob@example.com',
+    email: 'seller@test.com',
     avatarUrl: 'https://picsum.photos/seed/avatar2/100/100',
     role: 'seller',
     skills: ['Web Development', 'React', 'Node.js', 'TypeScript'],
@@ -134,16 +134,3 @@ export const conversations: Conversation[] = [
     { id: 'conv-1', participantIds: ['user-1', 'user-3'], lastMessage: conversation1Messages[conversation1Messages.length - 1] },
     { id: 'conv-2', participantIds: ['user-4', 'user-2'], lastMessage: conversation2Messages[conversation2Messages.length - 1] },
 ];
-
-// Mock current user - currently set to a seller. Switch to a buyer to test buyer view.
-export const getCurrentUser = (): User => {
-  const seller = users.find(u => u.role === 'seller' && u.id === 'user-2');
-  if (!seller) throw new Error("Seller with id 'user-2' not found in mock data.");
-  return seller;
-};
-
-export const getSellerUser = (): User => {
-  const seller = users.find(u => u.role === 'seller' && u.id === 'user-2');
-  if (!seller) throw new Error("No seller found in mock data.");
-  return seller;
-}

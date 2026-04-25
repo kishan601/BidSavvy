@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Table,
   TableBody,
@@ -8,13 +10,18 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { bids, projects, getSellerUser } from '@/lib/data';
+import { useAppContext } from '@/context/app-context';
 import { format } from 'date-fns';
 import Link from 'next/link';
 
 export default function MyBidsPage() {
-  const user = getSellerUser();
-  const myBids = bids.filter(b => b.sellerId === user.id);
+  const { currentUser, bids, projects } = useAppContext();
+  
+  if (!currentUser || currentUser.role !== 'seller') {
+    return null;
+  }
+
+  const myBids = bids.filter(b => b.sellerId === currentUser.id);
 
   return (
     <Card>

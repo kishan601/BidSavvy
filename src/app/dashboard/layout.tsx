@@ -1,4 +1,7 @@
-import { getCurrentUser } from '@/lib/data';
+'use client';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAppContext } from '@/context/app-context';
 import {
   SidebarProvider,
   Sidebar,
@@ -13,13 +16,39 @@ import { DashboardNav } from '@/components/dashboard-nav';
 import { UserNav } from '@/components/user-nav';
 import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = getCurrentUser();
+  const { currentUser, isLoading } = useAppContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !currentUser) {
+      router.push('/login');
+    }
+  }, [currentUser, isLoading, router]);
+
+  if (isLoading || !currentUser) {
+    return (
+      <div className="flex h-screen">
+        <div className="hidden md:flex flex-col gap-4 p-2 border-r">
+          <Skeleton className="h-10 w-48" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full mt-auto" />
+        </div>
+        <div className="flex-1 p-6">
+          <Skeleton className="h-16 w-1/2 mb-4" />
+          <Skeleton className="h-40 w-full" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>
@@ -28,10 +57,10 @@ export default function DashboardLayout({
           <Logo />
         </SidebarHeader>
         <SidebarContent>
-          <DashboardNav user={user} />
+          <DashboardNav />
         </SidebarContent>
         <SidebarFooter>
-          <UserNav user={user} />
+          <UserNav />
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>

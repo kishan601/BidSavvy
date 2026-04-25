@@ -1,3 +1,4 @@
+'use client';
 import {
   Card,
   CardContent,
@@ -8,11 +9,16 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { projects, users, bids } from '@/lib/data';
+import { useAppContext } from '@/context/app-context';
 import { CheckCircle, MessageSquare } from 'lucide-react';
-import { notFound } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 export default function BuyerProjectDetailPage({ params }: { params: { id: string } }) {
+  const { projects, users, bids, acceptBid } = useAppContext();
+  const router = useRouter();
+  const { toast } = useToast();
+  
   const project = projects.find(p => p.id === params.id);
   
   if (!project) {
@@ -21,6 +27,15 @@ export default function BuyerProjectDetailPage({ params }: { params: { id: strin
 
   const projectBids = bids.filter(b => b.projectId === project.id);
   const acceptedBid = projectBids.find(b => b.status === 'accepted');
+
+  const handleAcceptBid = (bidId: string) => {
+    acceptBid(bidId, project.id);
+    toast({
+        title: "Bid Accepted!",
+        description: "The seller has been notified and the project is now in progress.",
+    });
+    router.push('/dashboard/projects');
+  }
 
   return (
     <div className="space-y-6">
@@ -58,7 +73,7 @@ export default function BuyerProjectDetailPage({ params }: { params: { id: strin
               </CardContent>
               <CardContent className="flex gap-2">
                 {!acceptedBid && (
-                   <Button>
+                   <Button onClick={() => handleAcceptBid(bid.id)}>
                     <CheckCircle className="mr-2 h-4 w-4" /> Accept Bid
                   </Button>
                 )}

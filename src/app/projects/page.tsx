@@ -36,7 +36,7 @@ export default function ProjectsPage() {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1 py-8">
-        <div className="container">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-4 mb-8">
               <h1 className="text-4xl font-bold font-headline">Find Your Next Project</h1>
               <p className="text-muted-foreground text-lg">Browse through hundreds of projects and find the one that fits your skills.</p>

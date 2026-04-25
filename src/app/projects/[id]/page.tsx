@@ -64,7 +64,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1 py-8">
-        <div className="container">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-8">
             <div className="md:col-span-2 space-y-6">
               <Card>

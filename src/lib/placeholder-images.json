@@ -1,3 +1,46 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "avatar1",
+      "description": "User avatar 1",
+      "imageUrl": "https://picsum.photos/seed/avatar1/100/100",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar2",
+      "description": "User avatar 2",
+      "imageUrl": "https://picsum.photos/seed/avatar2/100/100",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar3",
+      "description": "User avatar 3",
+      "imageUrl": "https://picsum.photos/seed/avatar3/100/100",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar4",
+      "description": "User avatar 4",
+      "imageUrl": "https://picsum.photos/seed/avatar4/100/100",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "project-thumb1",
+      "description": "Project thumbnail 1",
+      "imageUrl": "https://picsum.photos/seed/project1/400/300",
+      "imageHint": "abstract tech"
+    },
+    {
+      "id": "project-thumb2",
+      "description": "Project thumbnail 2",
+      "imageUrl": "https://picsum.photos/seed/project2/400/300",
+      "imageHint": "office teamwork"
+    },
+    {
+      "id": "project-thumb3",
+      "description": "Project thumbnail 3",
+      "imageUrl": "https://picsum.photos/seed/project3/400/300",
+      "imageHint": "code screen"
+    }
+  ]
 }

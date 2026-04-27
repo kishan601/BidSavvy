@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import type { User, Project, Bid, Conversation, Message } from '@/lib/types';
 import { users as initialUsers, projects as initialProjects, bids as initialBids, conversations as initialConversations, messages as initialMessages } from './initial-data';
 import { useRouter } from 'next/navigation';
+import { placeBid } from '@/lib/bidding';
 
 interface AppContextType {
     currentUser: User | null;
@@ -16,33 +17,37 @@ interface AppContextType {
     logout: () => void;
     register: (details: { name: string; email: string; role: 'buyer' | 'seller' }) => boolean;
     addProject: (project: Omit<Project, 'id' | 'status'>) => void;
-    addBid: (bid: Omit<Bid, 'id' | 'timestamp' | 'status'>) => void;
+    addBid: (bid: Omit<Bid, 'id' | 'createdAt' | 'status'>) => void;
     acceptBid: (bidId: string, projectId: string) => void;
-    updateUserProfile: (details: { name?: string; email?: string; profileDescription?: string }) => void;
+    updateUserProfile: (details: Partial<User>) => void;
     addSkillToUser: (skill: string) => void;
     removeSkillFromUser: (skill: string) => void;
     sendMessage: (conversationId: string, senderId: string, receiverId: string, text: string) => void;
+    createConversation: (participantIds: string[]) => Conversation;
+    getConversation: (participantIds: string[]) => Conversation | null;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    if (typeof window === 'undefined') {
+      return null
+    }
+    try {
+      const storedUser = localStorage.getItem('currentUser');
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch (error) {
+      return null
+    }
+  });
+    const [isLoading, setIsLoading] = useState(false);
     const [users, setUsers] = useState<User[]>(initialUsers);
     const [projects, setProjects] = useState<Project[]>(initialProjects);
     const [bids, setBids] = useState<Bid[]>(initialBids);
     const [conversations, setConversations] = useState<Conversation[]>(initialConversations);
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const router = useRouter();
-    
-    useEffect(() => {
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-            setCurrentUser(JSON.parse(storedUser));
-        }
-        setIsLoading(false);
-    }, []);
 
     const login = (email: string): boolean => {
         const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
@@ -70,8 +75,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
             email: details.email,
             role: details.role,
             avatarUrl: `https://picsum.photos/seed/${Date.now()}/100/100`,
-            skills: [],
-            profileDescription: '',
         };
         setUsers(prevUsers => [...prevUsers, newUser]);
         setCurrentUser(newUser);
@@ -88,19 +91,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setProjects(prev => [...prev, newProject]);
     }
     
-    const addBid = (bid: Omit<Bid, 'id' | 'timestamp' | 'status'>) => {
-        const newBid: Bid = {
-            ...bid,
-            id: `bid-${Date.now()}`,
-            timestamp: new Date().toISOString(),
-            status: 'pending'
-        };
-        setBids(prev => [...prev, newBid]);
+    const addBid = (bidDetails: Omit<Bid, 'id' | 'createdAt' | 'status'>) => {
+        const result = placeBid(bids, projects, bidDetails);
+
+        if (result.success) {
+            setBids(result.bids);
+        } else {
+            // In a real app, you'd use a toast notification or a more elegant error display.
+            alert(`Error placing bid: ${result.message}`);
+        }
     }
     
     const acceptBid = (bidId: string, projectId: string) => {
         setBids(prev => prev.map(b => {
             if (b.projectId === projectId) {
+                // Reject all other bids for this project
                 return b.id === bidId ? { ...b, status: 'accepted' } : { ...b, status: 'rejected' };
             }
             return b;
@@ -108,7 +113,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setProjects(prev => prev.map(p => p.id === projectId ? { ...p, status: 'in-progress' } : p));
     }
     
-    const updateUserProfile = (details: { name?: string; email?: string; profileDescription?: string }) => {
+    const updateUserProfile = (details: Partial<User>) => {
         if (!currentUser) return;
         const updatedUser = { ...currentUser, ...details };
         setCurrentUser(updatedUser);
@@ -117,15 +122,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
 
     const addSkillToUser = (skill: string) => {
-        if (!currentUser || currentUser.role !== 'seller') return;
+        if (!currentUser || currentUser.role !== 'seller' || (currentUser.skills && currentUser.skills.includes(skill))) return;
         const skills = [...(currentUser.skills || []), skill];
-        updateUserProfile({ skills });
+        updateUserProfile({ ...currentUser, skills });
     }
     
     const removeSkillFromUser = (skill: string) => {
-        if (!currentUser || currentUser.role !== 'seller') return;
-        const skills = (currentUser.skills || []).filter(s => s !== skill);
-        updateUserProfile({ skills });
+        if (!currentUser || !currentUser.skills) return;
+        const skills = currentUser.skills.filter(s => s !== skill);
+        updateUserProfile({ ...currentUser, skills });
     }
     
     const sendMessage = (conversationId: string, senderId: string, receiverId: string, text: string) => {
@@ -135,11 +140,34 @@ export function AppProvider({ children }: { children: ReactNode }) {
             senderId,
             receiverId,
             text,
-            timestamp: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
         };
         setMessages(prev => [...prev, newMessage]);
         setConversations(prev => prev.map(c => c.id === conversationId ? { ...c, lastMessage: newMessage } : c));
     }
+
+    const createConversation = (participantIds: string[]): Conversation => {
+        const existingConversation = getConversation(participantIds);
+        if (existingConversation) {
+            return existingConversation;
+        }
+
+        const newConversation: Conversation = {
+            id: `conv-${Date.now()}`,
+            participantIds,
+            lastMessage: null,
+        };
+
+        setConversations(prev => [...prev, newConversation]);
+        return newConversation;
+    };
+
+    const getConversation = (participantIds: string[]): Conversation | null => {
+        return conversations.find(c => 
+            c.participantIds.length === participantIds.length && 
+            c.participantIds.every(id => participantIds.includes(id))
+        ) || null;
+    };
 
     const value = {
         currentUser,
@@ -159,6 +187,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         addSkillToUser,
         removeSkillFromUser,
         sendMessage,
+        createConversation,
+        getConversation,
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

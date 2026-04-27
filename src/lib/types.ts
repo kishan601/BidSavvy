@@ -1,4 +1,4 @@
-export type User = {
+export interface User {
   id: string;
   name: string;
   email: string;
@@ -6,40 +6,40 @@ export type User = {
   role: 'buyer' | 'seller';
   skills?: string[];
   profileDescription?: string;
-};
+}
 
-export type Project = {
+export interface Project {
   id: string;
   title: string;
   description: string;
   budget: number;
   deadline: string;
-  status: 'open' | 'in-progress' | 'completed';
+  status: 'open' | 'in-progress' | 'completed' | 'canceled';
   buyerId: string;
   requiredSkills: string[];
-};
+}
 
-export type Bid = {
-  id:string;
+export interface Bid {
+  id: string;
   projectId: string;
   sellerId: string;
   amount: number;
   proposal: string;
-  timestamp: string;
-  status: 'pending' | 'accepted' | 'rejected';
-};
+  createdAt: string; // Changed from timestamp
+  status: 'pending' | 'accepted' | 'rejected' | 'invalid';
+}
 
-export type Message = {
-    id: string;
-    conversationId: string;
-    senderId: string;
-    receiverId: string;
-    text: string;
-    timestamp: string;
-};
+export interface Message {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  receiverId: string;
+  text: string;
+  createdAt: string; // Changed from timestamp
+}
 
-export type Conversation = {
-    id: string;
-    participantIds: string[];
-    lastMessage: Message;
-};
+export interface Conversation {
+  id: string;
+  participantIds: string[];
+  lastMessage?: Message | null;
+}

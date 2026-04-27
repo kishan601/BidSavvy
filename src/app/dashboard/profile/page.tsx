@@ -15,18 +15,10 @@ export default function ProfilePage() {
   const { currentUser, updateUserProfile, addSkillToUser, removeSkillFromUser } = useAppContext();
   const { toast } = useToast();
   
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [profileDescription, setProfileDescription] = useState('');
+  const [name, setName] = useState(currentUser?.name ?? '');
+  const [email, setEmail] = useState(currentUser?.email ?? '');
+  const [profileDescription, setProfileDescription] = useState(currentUser?.profileDescription ?? '');
   const [newSkill, setNewSkill] = useState('');
-
-  useEffect(() => {
-    if (currentUser) {
-      setName(currentUser.name);
-      setEmail(currentUser.email);
-      setProfileDescription(currentUser.profileDescription || '');
-    }
-  }, [currentUser]);
 
   if (!currentUser) {
     return null;

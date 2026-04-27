@@ -80,7 +80,7 @@ export default function RecommendationsPage() {
                           <CardContent className="space-y-4">
                               <p className="text-sm text-muted-foreground line-clamp-3">{project.description}</p>
                               <div>
-                                  <h4 className="font-semibold text-sm mb-2">Why it's a good match:</h4>
+                                  <h4 className="font-semibold text-sm mb-2">Why it&apos;s a good match:</h4>
                                   <p className="text-sm text-primary/80 italic border-l-2 border-primary pl-2">{rec.reason}</p>
                               </div>
                                <div className="flex flex-wrap gap-2">

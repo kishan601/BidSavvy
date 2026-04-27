@@ -85,7 +85,7 @@ export const bids: Bid[] = [
     sellerId: 'user-3',
     amount: 4800,
     proposal: "I can deliver a modern and clean redesign that will significantly improve user engagement. My portfolio includes several successful e-commerce projects. I'll provide wireframes, mockups, and a full prototype.",
-    timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     status: 'pending',
   },
   {
@@ -94,7 +94,7 @@ export const bids: Bid[] = [
     sellerId: 'user-2',
     amount: 7500,
     proposal: 'With my experience in building scalable backends, I am confident I can build a secure and efficient REST API for your mobile app. I will use Node.js, Express, and PostgreSQL to ensure performance and reliability.',
-    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     status: 'pending',
   },
   {
@@ -103,7 +103,7 @@ export const bids: Bid[] = [
     sellerId: 'user-2',
     amount: 5200,
     proposal: "While my primary skill is development, I have a keen eye for design and can create a functional and appealing UI. I can also handle the front-end implementation in React.",
-    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     status: 'rejected',
   },
    {
@@ -112,23 +112,23 @@ export const bids: Bid[] = [
     sellerId: 'user-2',
     amount: 4200,
     proposal: 'I have extensive experience with React and TypeScript and have built component libraries before. I will ensure the final product is well-tested with Jest and React Testing Library.',
-    timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
     status: 'accepted',
   },
 ];
 
 const conversation1Messages: Message[] = [
-    { id: 'msg-1', conversationId: 'conv-1', senderId: 'user-1', receiverId: 'user-3', text: "Hi Charlie, I really liked your proposal for the e-commerce redesign. Can you share some examples of your previous work?", timestamp: new Date(Date.now() - 60 * 60 * 1000).toISOString() },
-    { id: 'msg-2', conversationId: 'conv-1', senderId: 'user-3', receiverId: 'user-1', text: "Hello Alice! Absolutely, I'd be happy to. Here's a link to my portfolio: [link]. Let me know what you think!", timestamp: new Date(Date.now() - 55 * 60 * 1000).toISOString() },
-    { id: 'msg-3', conversationId: 'conv-1', senderId: 'user-1', receiverId: 'user-3', text: "Thanks! Your work looks great. Very impressive.", timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString() },
+    { id: 'msg-1', conversationId: 'conv-1', senderId: 'user-1', receiverId: 'user-3', text: "Hi Charlie, I really liked your proposal for the e-commerce redesign. Can you share some examples of your previous work?", createdAt: new Date(Date.now() - 60 * 60 * 1000).toISOString() },
+    { id: 'msg-2', conversationId: 'conv-1', senderId: 'user-3', receiverId: 'user-1', text: "Hello Alice! Absolutely, I'd be happy to. Here's a link to my portfolio: [link]. Let me know what you think!", createdAt: new Date(Date.now() - 55 * 60 * 1000).toISOString() },
+    { id: 'msg-3', conversationId: 'conv-1', senderId: 'user-1', receiverId: 'user-3', text: "Thanks! Your work looks great. Very impressive.", createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString() },
 ];
 
 const conversation2Messages: Message[] = [
-    { id: 'msg-4', conversationId: 'conv-2', senderId: 'user-4', receiverId: 'user-2', text: "Hi Bob, your bid for the REST API project is interesting. How would you handle scalability?", timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() },
-    { id: 'msg-5', conversationId: 'conv-2', senderId: 'user-2', receiverId: 'user-4', text: "Hi Diana. I plan to use a microservices architecture with load balancing to ensure the API can handle high traffic. We can discuss the specifics further if you'd like.", timestamp: new Date(Date.now() - 1.5 * 60 * 60 * 1000).toISOString() },
+    { id: 'msg-4', conversationId: 'conv-2', senderId: 'user-4', receiverId: 'user-2', text: "Hi Bob, your bid for the REST API project is interesting. How would you handle scalability?", createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() },
+    { id: 'msg-5', conversationId: 'conv-2', senderId: 'user-2', receiverId: 'user-4', text: "Hi Diana. I plan to use a microservices architecture with load balancing to ensure the API can handle high traffic. We can discuss the specifics further if you'd like.", createdAt: new Date(Date.now() - 1.5 * 60 * 60 * 1000).toISOString() },
 ];
 
-export const messages = [...conversation1Messages, ...conversation2Messages];
+export const messages: Message[] = [...conversation1Messages, ...conversation2Messages];
 
 export const conversations: Conversation[] = [
     { id: 'conv-1', participantIds: ['user-1', 'user-3'], lastMessage: conversation1Messages[conversation1Messages.length - 1] },

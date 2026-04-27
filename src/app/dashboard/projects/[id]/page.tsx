@@ -13,6 +13,7 @@ import { useAppContext } from '@/context/app-context';
 import { CheckCircle, MessageSquare } from 'lucide-react';
 import { notFound, useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 
 export default function BuyerProjectDetailPage({ params }: { params: { id: string } }) {
   const { projects, users, bids, acceptBid } = useAppContext();
@@ -62,6 +63,7 @@ export default function BuyerProjectDetailPage({ params }: { params: { id: strin
                       <CardTitle>{seller.name}</CardTitle>
                       <CardDescription>
                         Bid Amount: <span className="font-bold text-foreground">${bid.amount.toLocaleString()}</span>
+                         <span className="text-xs text-muted-foreground ml-2">{format(new Date(bid.createdAt), 'MMM d, yyyy')}</span>
                       </CardDescription>
                     </div>
                   </div>
